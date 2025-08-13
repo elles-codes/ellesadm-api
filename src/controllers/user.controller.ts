@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUserService } from "../services/auth.service";
+import { createUserService } from "../services/user.service";
 
 export async function createUserController(req: Request, res: Response) {
   const { name, email, password, roleId } = req.body;
