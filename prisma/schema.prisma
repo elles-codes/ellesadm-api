@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  name       String
+  email      String     @unique
+  password   String
+  roleId     Int
+  role       Role       @relation(fields: [roleId], references: [id])
+  companies  Company[]  @relation("UserCompanies")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Role {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique // ADMIN, GERENTE, FINANCEIRO, etc.
+  users User[]
+}
+
+model Company {
+  id         Int         @id @default(autoincrement())
+  name       String
+  cnpj       String      @unique
+  users      User[]      @relation("UserCompanies")
+  partners   Partner[]
+  clients    Client[]
+  properties Property[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Partner {
+  id         Int        @id @default(autoincrement())
+  name       String
+  cpf        String     @unique
+  documents  Document[]
+  companyId  Int
+  company    Company    @relation(fields: [companyId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Document {
+  id         Int        @id @default(autoincrement())
+  name       String
+  url        String     // URL no S3
+  type       String     // RG, Certidão, Contrato...
+  partnerId  Int
+  partner    Partner    @relation(fields: [partnerId], references: [id])
+  createdAt  DateTime   @default(now())
+}
+
+model Client {
+  id         Int        @id @default(autoincrement())
+  name       String
+  cpfCnpj    String     @unique
+  companyId  Int
+  company    Company    @relation(fields: [companyId], references: [id])
+  rentals    Rental[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Property {
+  id         Int        @id @default(autoincrement())
+  address    String
+  companyId  Int
+  company    Company    @relation(fields: [companyId], references: [id])
+  rentals    Rental[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Rental {
+  id         Int        @id @default(autoincrement())
+  propertyId Int
+  property   Property   @relation(fields: [propertyId], references: [id])
+  clientId   Int
+  client     Client     @relation(fields: [clientId], references: [id])
+  startDate  DateTime
+  endDate    DateTime
+  value      Decimal    @db.Decimal(10,2)
+  payments   Payment[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Payment {
+  id         Int        @id @default(autoincrement())
+  rentalId   Int
+  rental     Rental     @relation(fields: [rentalId], references: [id])
+  amount     Decimal    @db.Decimal(10,2)
+  dueDate    DateTime
+  paidDate   DateTime?
+  status     String     // pago, atrasado, pendente
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
