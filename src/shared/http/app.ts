@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors"
 import dotenv from "dotenv";
 import authRoutes from "../../routes/auth.routes";
 import { authMiddleware } from "../../middlwares/auth.middleware";
@@ -13,6 +14,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 // Rotas públicas
 app.use("/auth", authRoutes);
