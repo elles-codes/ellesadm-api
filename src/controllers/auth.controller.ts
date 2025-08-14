@@ -36,7 +36,8 @@ export async function loginController(req: Request, res: Response) {
 }
 
 export async function refreshTokenController(req: Request, res: Response) {
-  const { refreshToken } = req.cookies?.refreshToken;
+  // Pega o refresh token do cookie httpOnly
+  const refreshToken = req.cookies?.refreshToken;
 
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token é obrigatório" });
@@ -52,7 +53,6 @@ export async function refreshTokenController(req: Request, res: Response) {
     if (!storedToken) return res.status(401).json({ message: "Refresh token inválido" });
 
     if (new Date() > storedToken.expiresAt) {
-      // Token expirado, remove do banco
       await prisma.refreshToken.delete({ where: { id: storedToken.id } });
       return res.status(401).json({ message: "Refresh token expirado" });
     }
@@ -68,5 +68,28 @@ export async function refreshTokenController(req: Request, res: Response) {
     res.json({ accessToken: newAccessToken });
   } catch (err: any) {
     res.status(401).json({ message: "Refresh token inválido" });
+  }
+}
+
+export async function logoutController(req: Request, res: Response) {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (refreshToken) {
+      // Remove do banco se existir
+      await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+    }
+
+    // Limpa o cookie
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    // Limpa access token no front-end (o front deve remover do localStorage)
+    res.json({ message: "Logout realizado com sucesso" });
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao fazer logout" });
   }
 }
