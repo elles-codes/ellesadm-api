@@ -26,7 +26,6 @@ export async function getProfileController(req: Request, res: Response) {
   
   try {
     const data = await getUserProfile(userId)
-    console.log(data)
     res.status(200).json(data)
   } catch (err: any) {
     res.status(400).json({ message: err.message });
