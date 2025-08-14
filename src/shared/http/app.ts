@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors"
+import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 import authRoutes from "../../routes/auth.routes";
 import { authMiddleware } from "../../middlwares/auth.middleware";
@@ -12,9 +13,18 @@ import {companyRoutes} from "../../routes/company.routes"
 // Carrega variáveis de ambiente
 dotenv.config();
 
+const frontUrl = process.env.FRONT_URL || 'http://localhost:5173';
+
 const app = express();
+
+app.use(cors({
+  origin: frontUrl,
+  credentials: true
+}));
+
+app.use(cookieParser());
+
 app.use(express.json());
-app.use(cors())
 
 // Rotas públicas
 app.use("/auth", authRoutes);

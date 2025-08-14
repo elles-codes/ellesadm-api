@@ -14,9 +14,15 @@ export async function loginController(req: Request, res: Response) {
 
   try {
     const { accessToken, refreshToken, user } = await loginUser(email, password);
+     res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true no HTTPS
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
+    });
+
     res.json({
       accessToken,
-      refreshToken,
       user: {
         id: user.id,
         name: user.name,
@@ -30,7 +36,7 @@ export async function loginController(req: Request, res: Response) {
 }
 
 export async function refreshTokenController(req: Request, res: Response) {
-  const { refreshToken } = req.body;
+  const { refreshToken } = req.cookies?.refreshToken;
 
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token é obrigatório" });
@@ -52,7 +58,7 @@ export async function refreshTokenController(req: Request, res: Response) {
     }
 
     // Verifica a assinatura
-    const decoded: any = verifyRefreshToken(refreshToken);
+    verifyRefreshToken(refreshToken);
 
     const newAccessToken = generateAccessToken({
       userId: storedToken.user.id,
