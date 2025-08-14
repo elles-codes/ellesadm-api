@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createCompanyController } from "../controllers/company.controller";
+import { createCompanyController, getCompaniesController } from "../controllers/company.controller";
 import { authMiddleware } from "../middlwares/auth.middleware";
 import { roleMiddleware } from "../middlwares/role.middleware";
 
@@ -12,5 +12,7 @@ router.post(
   roleMiddleware(["ADMIN", "GERENTE"]),
   createCompanyController
 );
+
+router.get("/", authMiddleware, roleMiddleware(["ADMIN", "GERENTE", "FUNCIONARIO"]), getCompaniesController)
 
 export { router as companyRoutes };

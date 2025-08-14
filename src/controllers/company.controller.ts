@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createCompanyService } from "../services/company.service";
+import { createCompanyService, getCompaniesService } from "../services/company.service";
 
 export async function createCompanyController(req: Request, res: Response) {
   try {
@@ -7,5 +7,14 @@ export async function createCompanyController(req: Request, res: Response) {
     res.status(201).json(company);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
+  }
+}
+
+export async function getCompaniesController(req:Request, res: Response) {
+  try {
+    const companies = await getCompaniesService();
+    res.status(200).json(companies)
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });  
   }
 }

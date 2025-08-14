@@ -49,3 +49,12 @@ export async function createCompanyService(data: CreateCompanyInput) {
 
   return company;
 }
+
+export async function getCompaniesService() {
+  return await prisma.company.findMany({
+    include: {
+      partners: true,
+      properties: true,
+    },
+  });
+}
