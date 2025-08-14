@@ -58,3 +58,9 @@ export async function getCompaniesService() {
     },
   });
 }
+
+export async function getCompanyById(id: number) {
+  return prisma.company.findUnique({
+    where: { id },
+  });
+}

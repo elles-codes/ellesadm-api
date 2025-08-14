@@ -34,3 +34,20 @@ export async function createUserService(data: {
 
   return user;
 }
+
+export async function getUserProfile(userId: number) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      role: true,
+      companies: true,
+      rentals: {
+        include: {
+          property: true,
+          payments: true,
+        },
+      },
+      refreshTokens: true,
+    },
+  });
+}

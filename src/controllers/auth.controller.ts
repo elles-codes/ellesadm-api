@@ -36,7 +36,6 @@ export async function loginController(req: Request, res: Response) {
 }
 
 export async function refreshTokenController(req: Request, res: Response) {
-  // Pega o refresh token do cookie httpOnly
   const refreshToken = req.cookies?.refreshToken;
 
   if (!refreshToken) {
@@ -44,7 +43,6 @@ export async function refreshTokenController(req: Request, res: Response) {
   }
 
   try {
-    // Verifica se o token existe no banco
     const storedToken = await prisma.refreshToken.findUnique({
       where: { token: refreshToken },
       include: { user: { include: { role: true } } }
@@ -57,7 +55,6 @@ export async function refreshTokenController(req: Request, res: Response) {
       return res.status(401).json({ message: "Refresh token expirado" });
     }
 
-    // Verifica a assinatura
     verifyRefreshToken(refreshToken);
 
     const newAccessToken = generateAccessToken({

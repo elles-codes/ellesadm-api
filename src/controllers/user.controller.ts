@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUserService } from "../services/user.service";
+import { createUserService, getUserProfile } from "../services/user.service";
 
 export async function createUserController(req: Request, res: Response) {
   const { name, email, password, roleId } = req.body;
@@ -20,3 +20,16 @@ export async function createUserController(req: Request, res: Response) {
     res.status(400).json({ message: err.message });
   }
 }
+
+export async function getProfileController(req: Request, res: Response) {
+  const userId = req.user!.userId;
+  
+  try {
+    const data = await getUserProfile(userId)
+    console.log(data)
+    res.status(200).json(data)
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
