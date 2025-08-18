@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createRentalService, getRentalByIdService, getRentalsService, updateRentalService } from "../services/rental.service";
+import { createRentalService, deleteRentalService, getRentalByIdService, getRentalsService, updateRentalService } from "../services/rental.service";
 
 export async function createRentalController(req: Request, res: Response) {
   try {
@@ -17,6 +17,17 @@ export async function createRentalController(req: Request, res: Response) {
     res.status(201).json(rental);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+  }
+}
+
+export async function deleteRentalController(req: Request, res: Response) {
+  const id = Number(req.params.id)
+
+  try {
+    const response = await deleteRentalService(id)
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(403).json(error)
   }
 }
 

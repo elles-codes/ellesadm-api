@@ -4,6 +4,10 @@ import { generateAccessToken, generateRefreshToken } from "../config/jwt/jwt";
 
 const prisma = new PrismaClient();
 
+interface UserFilters {
+  role?: string;
+}
+
 export async function createUserService(data: {
   name: string;
   email: string;
@@ -51,3 +55,28 @@ export async function getUserProfile(userId: number) {
     },
   });
 }
+
+export async function getUsersService(filters: UserFilters = {}) {
+  const where: any = {};
+
+  if (filters.role) {
+    where.role = { name: filters.role };
+  }
+
+  return prisma.user.findMany({
+    where,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: { select: { id: true, name: true } }, // inclui a role
+      companies: { select: { id: true, name: true } },
+      rentals: { select: { id: true, value: true, startDate: true, endDate: true } },
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: { name: "asc" },
+  });
+}
+
+

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUserService, getUserProfile } from "../services/user.service";
+import { createUserService, getUserProfile, getUsersService } from "../services/user.service";
 
 export async function createUserController(req: Request, res: Response) {
   const { name, email, password, roleId } = req.body;
@@ -29,6 +29,23 @@ export async function getProfileController(req: Request, res: Response) {
     res.status(200).json(data)
   } catch (err: any) {
     res.status(400).json({ message: err.message });
+  }
+}
+
+
+export async function getUsersController(req: Request, res: Response) {
+  try {
+    const filters = {
+      role: req.query.role as string,
+      email: req.query.email as string,
+      companyId: req.query.companyId ? Number(req.query.companyId) : undefined,
+    };
+
+    const data = await getUsersService(filters);
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: "Erro ao buscar usuários" });
   }
 }
 

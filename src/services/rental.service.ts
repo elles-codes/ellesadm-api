@@ -48,6 +48,10 @@ export async function createRentalService(data: RentalInput) {
   return rental;
 }
 
+export async function deleteRentalService(id: number) {
+  return await prisma.rental.delete({where: {id}})
+}
+
 export async function getRentalsService() {
   return await prisma.rental.findMany({ include: {property: true, tenant: true, payments: true, _count: true} });
 }
